@@ -1,0 +1,14 @@
+import wollok.game.*
+
+describe "tests del game" {
+
+	fixture {
+		game.start()
+	}
+
+	test "Objetos bien posicionados al principio" {
+
+		assert.that(true)
+
+	}
+}
