@@ -12,7 +12,7 @@ program farmville {
 	game.height(10)
 	game.width(10)
 	game.ground("ground.png")
-
+	
  	
  	//	SETUP INICIAL
  	mercados.agregar(new Mercado(position = game.at(3,3), oro = 4000) )
