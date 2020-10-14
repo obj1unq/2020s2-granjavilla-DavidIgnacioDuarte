@@ -3,12 +3,12 @@ import wollok.game.*
 
 class Mercado {
 		
-var property position
+var property position = null
 const property image = "market.png"
     
     
-    var oro
-    const mercaderia = #{}
+    var property oro
+    const property mercaderia = #{}
     
     method validarCompra(precio) {
     	if (oro < precio) {

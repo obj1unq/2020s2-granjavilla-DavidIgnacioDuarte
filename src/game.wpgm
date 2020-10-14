@@ -15,18 +15,13 @@ program farmville {
 
  	
  	//	SETUP INICIAL
- 	mercados.agregar(new Mercado(position = game.at(3,3), oro = 1500) )
- 	mercados.agregar(new Mercado(position = game.at(6,9), oro = 1500) )
+ 	mercados.agregar(new Mercado(position = game.at(3,3), oro = 4000) )
+ 	mercados.agregar(new Mercado(position = game.at(6,9), oro = 5000) )
+ 	
+ 	aspersores.agregarAspersor(new Aspersor(frecuencia=5))
  	aspersores.colocarEn(5, game.center())
  	
  	game.addVisualCharacter(hector)
- 	/*
- 	game.addVisual(hector)
- 	keyboard.up().onPressDo({hector.position.up(1)})
- 	keyboard.down().onPressDo({hector.position.down(1)})
- 	keyboard.right().onPressDo({hector.position.right(1)})
- 	keyboard.left().onPressDo({hector.position.left(1)})
- 	*/
  	
  	
  	//	CONTROLES

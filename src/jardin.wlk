@@ -3,7 +3,7 @@ import wollok.game.*
 
 object jardin {
 	
-const plantas = #{}
+const property plantas = #{}
 	
 	
 	method agregarPlanta(planta){

@@ -1,0 +1,190 @@
+import wollok.game.*
+import hector.*
+import mercado.*
+import jardin.*
+import cultivos.*
+import aspersor.*
+
+
+describe "group of tests" {
+	
+	
+const maiz = new Maiz()
+const trigo = new Trigo()
+const tomaco = new Tomaco()	
+
+const mercado1 = new Mercado(position=game.at(8,8), oro=2000)
+const mercado2 = new Mercado(position=game.at(7,7), oro=3000)
+	
+	
+	fixture {
+		
+		game.clear()
+		
+		game.height(10)
+		game.width(10)
+		
+		game.addVisual(hector)
+		
+		hector.sembrar(maiz)
+		hector.sembrar(trigo)
+		hector.sembrar(tomaco)
+	
+		mercados.agregar(mercado1)
+		mercados.agregar(mercado2)
+		
+	}
+
+
+	test "Validación de la siembra" {
+
+		assert.that(game.hasVisual(hector))
+		
+		assert.equals(maiz.position(), hector.position())
+		assert.equals(trigo.position(), hector.position())
+		assert.equals(tomaco.position(), hector.position())
+		
+		assert.that(game.hasVisual(maiz))
+		assert.that(game.hasVisual(trigo))
+		assert.that(game.hasVisual(tomaco))
+		
+		assert.equals(jardin.plantas().size(), 3)
+
+	}
+	
+	
+	test "Héctor riega" {
+		
+		//PRIMER RIEGO
+		hector.regar()
+		assert.that(maiz.esAdulto())
+		assert.equals(trigo.etapa(), 1)
+		assert.equals(tomaco.position(), hector.position().up(1))
+		
+		//SEGUNDO RIEGO
+		hector.regar()
+		assert.that(maiz.esAdulto())
+		assert.equals(trigo.etapa(), 2)
+		assert.equals(tomaco.position(), hector.position().up(1))
+		
+		//TERCER RIEGO
+		hector.regar()
+		assert.that(maiz.esAdulto())
+		assert.equals(trigo.etapa(), 3)
+		assert.equals(tomaco.position(), hector.position().up(1))
+		
+		//CUARTO RIEGO
+		hector.regar()
+		assert.equals(trigo.etapa(), 0)
+		
+		//RIEGO AL TOMACO
+		hector.position(hector.position().up(1))
+		hector.regar()
+		assert.equals(tomaco.position(), hector.position().up(1))
+		
+		//INTENTO REGAR NADA
+		hector.position(hector.position().right(1))
+		assert.throwsException({hector.regar()})
+		
+	}
+	
+	
+	test "Funcionamiento del aspersor" {
+	
+	const aspersorInicial = new Aspersor(frecuencia=5)	
+	const maiz2 = new Maiz()
+	const tomaco2 = new Tomaco()
+		
+		aspersores.agregarAspersor(aspersorInicial)
+		aspersores.colocarEn(5, game.at(4,4)) //El aspersor que ya fue registrado
+		
+		assert.throwsException({aspersores.colocarEn(5, game.center())}) //No puede colocarse de nuevo
+		assert.throwsException({aspersores.colocarEn(3, game.center())}) //Ni hay de otras frecuencias
+		
+		assert.that(game.hasVisual(aspersorInicial))
+		
+		hector.position(game.at(5,4)) //Al este del aspersor
+		hector.sembrar(maiz2)
+		
+		hector.position(game.at(5,5)) //Al noreste del aspersor
+		hector.sembrar(tomaco2)
+		
+		aspersorInicial.regar()
+		assert.that(maiz.esAdulto()) //que se encontraba en la posición (3,3)
+		assert.that(maiz2.esAdulto()) //actual en la posición(5,4)
+		
+		assert.equals(trigo.etapa(), 1) // pos (3,3)
+		
+		assert.equals(tomaco.position(), game.at(3,4)) // previa pos(3,3)
+		assert.equals(tomaco2.position(), game.at(5,6)) // previa pos(3,3)
+		
+	}
+	
+	
+	test "Héctor cosecha" {
+		
+		hector.cosechar() // Sólo podrá el tomaco
+		
+		assert.that(hector.plantasParaVender().contains(tomaco))
+		assert.notThat(game.hasVisual(tomaco))
+		
+		assert.throwsExceptionWithMessage("no tengo plantas que cosechar", {hector.cosechar()})
+		//El maíz no es adulto y el trigo se encuentra en etapa 0.
+		
+		hector.regar() //crece el maíz
+		
+		hector.cosechar()
+		
+		assert.that(hector.plantasParaVender().contains(maiz))
+		assert.equals(hector.plantasParaVender().size(), 2)
+		assert.notThat(game.hasVisual(maiz))
+		
+		assert.equals(jardin.plantas().size(), 1)
+		
+		assert.throwsExceptionWithMessage("no tengo plantas que cosechar", {hector.cosechar()})
+		//Sólo queda el trigo en etapa 1.(Se podrá cosechar en etapa 2)
+		
+		hector.regar()
+		hector.cosechar()
+		
+		assert.that(hector.plantasParaVender().contains(trigo))
+		assert.equals(hector.plantasParaVender().size(), 3)
+		assert.equals(jardin.plantas().size(), 0)
+		assert.notThat(game.hasVisual(trigo))
+		
+		assert.throwsExceptionWithMessage("no tengo plantas que regar", {hector.regar()})
+		
+	}
+	
+	
+	test "Héctor vende" {
+		
+		hector.cosechar() //Nos aseguramos de cosechar primero el tomaco para que no varíe su pos.
+		3.times { index =>
+			hector.regar()
+		} //El maíz estará adulto, y el trigo en etapa 3.
+		hector.cosechar() //Cosechará ambas plantas de la posición actual.
+		
+		assert.equals(tomaco.precio(), 80)
+		assert.equals(maiz.precio(), 150)
+		assert.equals(trigo.precio(), 200)
+		
+		assert.throwsExceptionWithMessage("No hay mercados en esta posicion", {hector.vender()})
+		//Recordar la posición de los mercados
+		
+		hector.position(game.at(7,7))
+		
+		hector.vender()
+		
+		assert.equals(hector.oro(), 430)
+		assert.equals(mercado2.oro(), 2570)
+		
+		assert.equals(mercado2.mercaderia().size(), 3)
+		
+	}
+	
+	
+	
+	
+}
+

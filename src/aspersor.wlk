@@ -28,7 +28,7 @@ const frecuenciaMaxima = 5
 
 object aspersores {
 	
-const property todos = #{new Aspersor(frecuencia=5)}
+const property todos = #{}
 const property inGame = #{}
 	
 	

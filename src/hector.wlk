@@ -9,7 +9,7 @@ object hector {
 	
 var property position = new Position(x = 3, y = 3)
 const property image = "player.png"
-const plantasParaVender = #{}
+const property plantasParaVender = #{}
 var oro = 0
 	
 	
@@ -58,6 +58,10 @@ var oro = 0
 		if(aspersor.precio() > oro) {
 			self.error("No tengo suficiente oro para comprar el aspersor de frecuencia " + aspersor.frecuencia().toString())
 		}
+	}
+	
+	method oro() {
+		return oro
 	}
 	
 }

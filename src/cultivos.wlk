@@ -3,7 +3,7 @@ import wollok.game.*
 class Maiz {
 	
 var property position = null
-var esAdulto = false
+var property esAdulto = false
 	
 	
 	method regar() {
@@ -29,7 +29,7 @@ var esAdulto = false
 class Trigo {
 	
 var property position = null
-var etapa = 0
+var property etapa = 0
 	
 	
 	method image() {
